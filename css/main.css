@@ -1,0 +1,45 @@
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+
+#deck {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+#dealer-hand {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#messages {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+#player-hand {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+#money {
+    grid-column: 1;
+    grid-row: 3;
+}
+
+#bet-amount {
+    grid-column: 3;
+    grid-row: 3;
+}
+
+#bet-buttons {
+    grid-column: 2;
+    grid-row: 4;
+}
+
+#play-buttons {
+    grid-column: 2;
+    grid-row: 4;
+}
