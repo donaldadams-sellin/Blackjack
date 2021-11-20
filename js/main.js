@@ -6,7 +6,8 @@ const ranks = ['02', '03', '04', '05', '06', '07', '08', '09', '10', 'J', 'Q', '
 const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
-let shuffledDeck, playerHand, dealerHand, playerValue, dealerValue, betAmount, money, message;
+let turn, shuffledDeck, playerHand, dealerHand,
+    playerValue, dealerValue, betAmount, money, message;
 
 /*----- cached element references -----*/
 let dealerHandEl = document.getElementById('dealer-hand');
@@ -14,10 +15,13 @@ let playerHandEl = document.getElementById('player-hand');
 let messageEl = document.getElementById('message');
 let moneyEl = document.getElementById('money');
 let betAmountEl = document.getElementById('bet-amount');
+let betButtons = document.getElementById('bet-buttons');
+let playButtons = document.getElementById('play-buttons');
 
 
 /*----- event listeners -----*/
-
+betButtons.addEventListener('click', handleBetClick);
+playButtons.addEventListener('click', handlePlayClick);
 
 
 /*----- functions -----*/
@@ -31,18 +35,56 @@ function init() {
     betAmount = 0;
     money = 500;
     message = 'Place your bet!';
+    turn = 'bet';
     render();
 }
-//main render function
 
-function render(){
+//main render function
+function render() {
     moneyEl.textContent = `Money: $${money}`;
     messageEl.textContent = message;
     betAmountEl.textContent = `Current Bet: $${betAmount}`
-    renderHand(playerHand,playerHandEl);
+    switch (turn) {
+        case 'bet':
+            playButtons.style.display = 'none';
+            betButtons.style.display = '';
+            break;
+        case 'player':
+            playButtons.style.display = '';
+            betButtons.style.display = 'none';
+            break;
+        case 'dealer':
+            playButtons.style.display = 'none';
+            betButtons.style.display = 'none';
+            break;
+    }
+    //render hands using helper function
+    renderHand(playerHand, playerHandEl);
     renderHand(dealerHand, dealerHandEl);
 }
 
+//function to handle bet buttons, including Deal
+function handleBetClick(evt) {
+    console.log(evt.target);
+    if(evt.target.id === 'deal'){
+        dealCard(playerHand);
+        dealCard(playerHand);
+        dealCard(dealerHand);
+        dealCard(dealerHand);
+        turn = 'player'
+        // checkBlackjack();
+        render();
+    }
+}
+
+//card dealing function
+function dealCard(hand){
+    hand.push(shuffledDeck.pop());
+}
+//function to handle play buttons
+function handlePlayClick(evt) {
+    console.log(evt.target);
+}
 
 
 
@@ -61,6 +103,7 @@ function buildMasterDeck() {
         });
     });
     return deck;
+
 }
 //deck shuffling function added from cardstarter repl
 function getNewShuffledDeck() {
@@ -76,7 +119,6 @@ function getNewShuffledDeck() {
     return newShuffledDeck;
 }
 
-//full deck rendering function from cardstarter repl, will build hand rendering function based on it
 //modified rendering function, based off of cardstarter repl
 function renderHand(hand, handEl) {
     handEl.innerHTML = '';
