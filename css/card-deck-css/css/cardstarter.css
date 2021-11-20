@@ -27,7 +27,7 @@
   /* Not a card, but a card-shaped outline to represent a
      droppable place, like an empty pile. */ }
   .card.small {
-    font-size: 12px; }
+    font-size: inherit; }
   .card.large {
     font-size: 26px; }
   .card.xlarge {

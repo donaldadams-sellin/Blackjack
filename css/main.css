@@ -1,7 +1,17 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: darkgreen;
+    color: lightgrey;
+}
 main {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-auto-rows: auto;
+    grid-auto-columns: auto;
 }
 
 #deck {
