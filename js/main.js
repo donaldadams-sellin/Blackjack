@@ -6,12 +6,38 @@ const ranks = ['02', '03', '04', '05', '06', '07', '08', '09', '10', 'J', 'Q', '
 const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
-let shuffledDeck;
+let shuffledDeck, playerHand, dealerHand, betAmount, money, message;
+
 /*----- cached element references -----*/
+let dealerHandEl = document.getElementById('dealer-hand');
+let playerHandEl = document.getElementById('player-hand');
+let messageEl = document.getElementById('message');
+let moneyEl = document.getElementById('money');
+let betAmountEl = document.getElementById('bet-amount');
+
 
 /*----- event listeners -----*/
 
+
+
 /*----- functions -----*/
+init();
+function init() {
+    shuffledDeck = getNewShuffledDeck();
+    playerHand = {
+        cards: [],
+        value: 0,
+    }
+    dealerHand = {
+        cards: [],
+        value: 0,
+    }
+    betAmount = 0;
+    money = 500;
+    message = 'Place your bet!';
+}
+
+
 //deck building function taken from cardstarter repl
 function buildMasterDeck() {
     const deck = [];
@@ -47,12 +73,12 @@ function renderDeckInContainer(deck, container) {
     container.innerHTML = '';
     // Let's build the cards as a string of HTML
     let cardsHtml = '';
-    deck.forEach(function(card) {
-      cardsHtml += `<div class="card ${card.face}"></div>`;
+    deck.forEach(function (card) {
+        cardsHtml += `<div class="card ${card.face}"></div>`;
     });
     // Or, use reduce to 'reduce' the array into a single thing - in this case a string of HTML markup 
     // const cardsHtml = deck.reduce(function(html, card) {
     //   return html + `<div class="card ${card.face}"></div>`;
     // }, '');
     container.innerHTML = cardsHtml;
-  }
+}
