@@ -6,7 +6,7 @@ const ranks = ['02', '03', '04', '05', '06', '07', '08', '09', '10', 'J', 'Q', '
 const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
-let shuffledDeck, playerHand, dealerHand, betAmount, money, message;
+let shuffledDeck, playerHand, dealerHand, playerValue, dealerValue, betAmount, money, message;
 
 /*----- cached element references -----*/
 let dealerHandEl = document.getElementById('dealer-hand');
@@ -24,18 +24,26 @@ let betAmountEl = document.getElementById('bet-amount');
 init();
 function init() {
     shuffledDeck = getNewShuffledDeck();
-    playerHand = {
-        cards: [],
-        value: 0,
-    }
-    dealerHand = {
-        cards: [],
-        value: 0,
-    }
+    playerHand = []
+    playerValue = 0;
+    dealerHand = []
+    dealerValue = 0;
     betAmount = 0;
     money = 500;
     message = 'Place your bet!';
+    render();
 }
+//main render function
+
+function render(){
+    moneyEl.textContent = `Money: $${money}`;
+    messageEl.textContent = message;
+    betAmountEl.textContent = `Current Bet: $${betAmount}`
+    renderHand(playerHand,playerHandEl);
+    renderHand(dealerHand, dealerHandEl);
+}
+
+
 
 
 //deck building function taken from cardstarter repl
@@ -69,16 +77,13 @@ function getNewShuffledDeck() {
 }
 
 //full deck rendering function from cardstarter repl, will build hand rendering function based on it
-function renderDeckInContainer(deck, container) {
-    container.innerHTML = '';
+//modified rendering function, based off of cardstarter repl
+function renderHand(hand, handEl) {
+    handEl.innerHTML = '';
     // Let's build the cards as a string of HTML
     let cardsHtml = '';
-    deck.forEach(function (card) {
+    hand.forEach(function (card) {
         cardsHtml += `<div class="card ${card.face}"></div>`;
     });
-    // Or, use reduce to 'reduce' the array into a single thing - in this case a string of HTML markup 
-    // const cardsHtml = deck.reduce(function(html, card) {
-    //   return html + `<div class="card ${card.face}"></div>`;
-    // }, '');
-    container.innerHTML = cardsHtml;
+    handEl.innerHTML = cardsHtml;
 }
