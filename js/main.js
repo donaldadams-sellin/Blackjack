@@ -7,7 +7,7 @@ const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
 let turn, shuffledDeck, playerHand, dealerHand,
-    playerValue, dealerValue, betAmount, money, message;
+    winner, betAmount, money, message;
 
 /*----- cached element references -----*/
 let dealerHandEl = document.getElementById('dealer-hand');
@@ -17,25 +17,31 @@ let moneyEl = document.getElementById('money');
 let betAmountEl = document.getElementById('bet-amount');
 let betButtons = document.getElementById('bet-buttons');
 let playButtons = document.getElementById('play-buttons');
+let resetButtons = document.getElementById('reset-buttons');
 
 
 /*----- event listeners -----*/
 betButtons.addEventListener('click', handleBetClick);
 playButtons.addEventListener('click', handlePlayClick);
-
+resetButtons.addEventListener('click', handleResetClick);
 
 /*----- functions -----*/
 init();
 function init() {
     shuffledDeck = getNewShuffledDeck();
-    playerHand = []
-    playerValue = 0;
-    dealerHand = []
-    dealerValue = 0;
+    playerHand = {
+        cards: [],
+        value: 0
+    }
+    dealerHand = {
+        cards: [],
+        value: 0
+    }
     betAmount = 0;
     money = 500;
     message = 'Place your bet!';
     turn = 'bet';
+    winner = null;
     render();
 }
 
@@ -48,44 +54,90 @@ function render() {
         case 'bet':
             playButtons.style.display = 'none';
             betButtons.style.display = '';
+            resetButtons.style.display = 'none';
             break;
         case 'player':
             playButtons.style.display = '';
             betButtons.style.display = 'none';
+            resetButtons.style.display = 'none';
             break;
         case 'dealer':
             playButtons.style.display = 'none';
             betButtons.style.display = 'none';
+            resetButtons.style.display = '';
             break;
     }
     //render hands using helper function
-    renderHand(playerHand, playerHandEl);
-    renderHand(dealerHand, dealerHandEl);
+    renderHand(playerHand.cards, playerHandEl);
+    renderHand(dealerHand.cards, dealerHandEl);
 }
 
 //function to handle bet buttons, including Deal
 function handleBetClick(evt) {
     console.log(evt.target);
-    if(evt.target.id === 'deal'){
+    let pressedButton = evt.target.id.replace('bet', '');
+    if (pressedButton === 'deal' && betAmount > 0) {
         dealCard(playerHand);
         dealCard(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
         turn = 'player'
-        // checkBlackjack();
+        checkBlackjack();
+        render();
+    } else if (parseInt(pressedButton)) {
+        betAmount + parseInt(pressedButton) <= money ? betAmount += parseInt(pressedButton) : null;
         render();
     }
 }
 
-//card dealing function
-function dealCard(hand){
-    hand.push(shuffledDeck.pop());
+//check for blackjack after initial deal
+function checkBlackjack() {
+    if (playerHand.value !== 21 && dealerHand.value !== 21) {
+        return;
+    } else if (playerHand.value === 21 && dealerHand.value === 21) {
+        winner = 'tie';
+        turn = 'dealer';
+    } else if (playerHand.value === 21) {
+        winner = 'player';
+        turn = 'dealer';
+        money += Math.floor(1.5 * betAmount);
+    } else {
+        winner = 'dealer';
+        money -= betAmount;
+    }
+
+}
+
+//deal card and add to value of hand
+function dealCard(hand) {
+    let card = shuffledDeck.pop()
+    hand.cards.push(card);
+    hand.value += card.value;
 }
 //function to handle play buttons
 function handlePlayClick(evt) {
-    console.log(evt.target);
+    if (evt.target.id === 'hit' && playerHand.value < 21){
+        dealCard(playerHand);
+        render();
+    };
 }
 
+//function to handle reset and next hand buttons
+function handleResetClick(evt) {
+    //just run init if reset is clicked, only reset some variables for next hand
+    if (evt.target.id === 'reset') {
+        init();
+    } else if (evt.target.id === 'next-hand') {
+        message = 'Place your bet!';
+        turn = 'bet';
+        betAmount = 0;
+        playerHand.cards = []
+        playerHand.value = 0;
+        dealerHand.cards = [];
+        dealerHand.value = 0;
+        render();
+    }
+}
 
 
 //deck building function taken from cardstarter repl

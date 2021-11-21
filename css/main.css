@@ -60,7 +60,7 @@ main {
     border: solid black;
 }
 
-#bet-buttons {
+#bet-buttons, #play-buttons, #reset-buttons {
     grid-column: 2;
     grid-row: 4;
 }
@@ -70,11 +70,6 @@ main {
     height:  50px;
     font-size: 18px;
     border-radius: 50%;
-}
-
-#play-buttons {
-    grid-column: 2;
-    grid-row: 4;
 }
 
 .play {
@@ -88,11 +83,7 @@ main {
     #deck, #dealer-hand, #player-hand {
         font-size: 20px;
     }
-    #bet-buttons {
-        grid-column: 3;
-        grid-row: 2;
-    }
-    #play-buttons {
+    #bet-buttons, #play-buttons, #reset-buttons {
         grid-column: 3;
         grid-row: 2;
     }
@@ -109,11 +100,7 @@ main {
     #deck, #dealer-hand, #player-hand {
         font-size: 12px;
     }
-    #bet-buttons {
-        grid-column: 3;
-        grid-row: 2;
-    }
-    #play-buttons {
+    #bet-buttons, #play-buttons, #reset-buttons {
         grid-column: 3;
         grid-row: 2;
     }
