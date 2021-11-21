@@ -95,14 +95,15 @@ function checkBlackjack() {
     if (playerHand.value !== 21 && dealerHand.value !== 21) {
         return;
     } else if (playerHand.value === 21 && dealerHand.value === 21) {
-        winner = 'tie';
+        message = `You and the dealer had Blackjack`;
         turn = 'dealer';
     } else if (playerHand.value === 21) {
-        winner = 'player';
+        message = `You got a Blackjack and win $${Math.floor(1.5*betAmount)}`;
         turn = 'dealer';
         money += Math.floor(1.5 * betAmount);
     } else {
-        winner = 'dealer';
+        betAmount === money ? message = `Dealer has Blackjack! You lost all your money!` : message = `Dealer has Blackjack! You lost $${betAmount}`;
+        turn = 'dealer';
         money -= betAmount;
     }
 
@@ -116,10 +117,40 @@ function dealCard(hand) {
 }
 //function to handle play buttons
 function handlePlayClick(evt) {
-    if (evt.target.id === 'hit' && playerHand.value < 21){
+    if (evt.target.id === 'hit' && playerHand.value < 21) {
         dealCard(playerHand);
+        if (playerHand.value > 21) {
+            turn = 'dealer'
+            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
+            money -= betAmount;
+        }
         render();
-    };
+    } else if (evt.target.id === 'stand') {
+        turn = `dealer`;
+        while (dealerHand.value < 17) {
+            dealCard(dealerHand);
+        }
+        if(dealerHand.value <= 21){
+        compareHands();
+        } else {
+            message = `Dealer busts! You win $${betAmount}`;
+            money += betAmount;
+        }
+        render();
+    }
+
+}
+
+function compareHands() {
+    if (playerHand.value === dealerHand.value) {
+        message = `Both hands are ${playerHand.value}, it's a tie`;
+    } else if (playerHand.value > dealerHand.value) {
+        message = `You had the better hand! You win $${betAmount}!`
+        money += betAmount;
+    } else {
+        betAmount === money ? message = `Dealer had the better hand! You lost all your money!` : message = `Dealer had the better hand!  You lose $${betAmount}`;
+        money -= betAmount
+    }
 }
 
 //function to handle reset and next hand buttons
@@ -128,15 +159,20 @@ function handleResetClick(evt) {
     if (evt.target.id === 'reset') {
         init();
     } else if (evt.target.id === 'next-hand') {
-        message = 'Place your bet!';
-        turn = 'bet';
-        betAmount = 0;
-        playerHand.cards = []
-        playerHand.value = 0;
-        dealerHand.cards = [];
-        dealerHand.value = 0;
-        render();
+        if (money === 0) {
+            return;
+        } else {
+            message = 'Place your bet!';
+            turn = 'bet';
+            betAmount = 0;
+            playerHand.cards = []
+            playerHand.value = 0;
+            dealerHand.cards = [];
+            dealerHand.value = 0;
+            render();
+        }
     }
+
 }
 
 
@@ -176,7 +212,7 @@ function renderHand(hand, handEl) {
     handEl.innerHTML = '';
     // Let's build the cards as a string of HTML
     let cardsHtml = '';
-    hand.forEach(function (card) {
+    hand.forEach(function (card, idx) {
         cardsHtml += `<div class="card ${card.face}"></div>`;
     });
     handEl.innerHTML = cardsHtml;
