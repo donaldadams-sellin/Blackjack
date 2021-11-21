@@ -7,7 +7,7 @@ const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
 let turn, shuffledDeck, playerHand, dealerHand,
-    winner, betAmount, money, message;
+    betAmount, money, message;
 
 /*----- cached element references -----*/
 let dealerHandEl = document.getElementById('dealer-hand');
@@ -18,7 +18,7 @@ let betAmountEl = document.getElementById('bet-amount');
 let betButtons = document.getElementById('bet-buttons');
 let playButtons = document.getElementById('play-buttons');
 let resetButtons = document.getElementById('reset-buttons');
-
+// let dealerCard = document.querySelector('#dealer-hand:first-child');
 
 /*----- event listeners -----*/
 betButtons.addEventListener('click', handleBetClick);
@@ -31,11 +31,12 @@ function init() {
     shuffledDeck = getNewShuffledDeck();
     playerHand = {
         cards: [],
-        value: 0
+        value: 0,
+
     }
     dealerHand = {
         cards: [],
-        value: 0
+        value: 0,
     }
     betAmount = 0;
     money = 500;
@@ -50,6 +51,9 @@ function render() {
     moneyEl.textContent = `Money: $${money}`;
     messageEl.textContent = message;
     betAmountEl.textContent = `Current Bet: $${betAmount}`
+    //render hands using helper function
+    renderHand(playerHand.cards, playerHandEl);
+    renderHand(dealerHand.cards, dealerHandEl);
     switch (turn) {
         case 'bet':
             playButtons.style.display = 'none';
@@ -60,16 +64,15 @@ function render() {
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
+            document.querySelector('#dealer-hand .card').style.display = 'none';
             break;
         case 'dealer':
             playButtons.style.display = 'none';
             betButtons.style.display = 'none';
             resetButtons.style.display = '';
+            document.querySelector('#dealer-hand .card').style.display = '';
             break;
     }
-    //render hands using helper function
-    renderHand(playerHand.cards, playerHandEl);
-    renderHand(dealerHand.cards, dealerHandEl);
 }
 
 //function to handle bet buttons, including Deal
@@ -98,7 +101,7 @@ function checkBlackjack() {
         message = `You and the dealer had Blackjack`;
         turn = 'dealer';
     } else if (playerHand.value === 21) {
-        message = `You got a Blackjack and win $${Math.floor(1.5*betAmount)}`;
+        message = `You got a Blackjack and win $${Math.floor(1.5 * betAmount)}`;
         turn = 'dealer';
         money += Math.floor(1.5 * betAmount);
     } else {
@@ -125,13 +128,17 @@ function handlePlayClick(evt) {
             money -= betAmount;
         }
         render();
+    } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
+        dealCard(playerHand);
     } else if (evt.target.id === 'stand') {
         turn = `dealer`;
+        //dealer must get cards til their hand value is at least 17
         while (dealerHand.value < 17) {
             dealCard(dealerHand);
         }
-        if(dealerHand.value <= 21){
-        compareHands();
+        //check for dealer bust before continuing with comparison
+        if (dealerHand.value <= 21) {
+            compareHands();
         } else {
             message = `Dealer busts! You win $${betAmount}`;
             money += betAmount;
@@ -140,7 +147,7 @@ function handlePlayClick(evt) {
     }
 
 }
-
+//function to compare hands against each other at end of dealers turn
 function compareHands() {
     if (playerHand.value === dealerHand.value) {
         message = `Both hands are ${playerHand.value}, it's a tie`;
@@ -212,7 +219,7 @@ function renderHand(hand, handEl) {
     handEl.innerHTML = '';
     // Let's build the cards as a string of HTML
     let cardsHtml = '';
-    hand.forEach(function (card, idx) {
+    hand.forEach(function (card) {
         cardsHtml += `<div class="card ${card.face}"></div>`;
     });
     handEl.innerHTML = cardsHtml;
