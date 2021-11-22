@@ -6,7 +6,7 @@ const ranks = ['02', '03', '04', '05', '06', '07', '08', '09', '10', 'J', 'Q', '
 const masterDeck = buildMasterDeck();
 
 /*----- app's state (variables) -----*/
-let turn, shuffledDeck, playerHand, dealerHand,
+let turn, shuffledDeck, playerHand, playerHand2, dealerHand,
     betAmount, money, message;
 
 /*----- cached element references -----*/
@@ -18,6 +18,8 @@ let betAmountEl = document.getElementById('bet-amount');
 let betButtons = document.getElementById('bet-buttons');
 let playButtons = document.getElementById('play-buttons');
 let resetButtons = document.getElementById('reset-buttons');
+let doubleDownEl = document.getElementById('double-down');
+let splitEl = document.getElementById('split');
 
 
 /*----- event listeners -----*/
@@ -30,6 +32,12 @@ init();
 function init() {
     shuffledDeck = getNewShuffledDeck();
     playerHand = {
+        cards: [],
+        value: 0,
+
+    }
+    //only used if hands are split
+    playerHand2 = {
         cards: [],
         value: 0,
 
@@ -54,6 +62,11 @@ function render() {
     //render hands using helper function
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
+    //don't render double down button after first hit
+    playerHand.cards.length > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
+    //show split button if player has 2 equal value cards
+    (playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
+    //change which buttons are displayed based on turn
     switch (turn) {
         case 'bet':
             playButtons.style.display = 'none';
@@ -81,6 +94,7 @@ function handleBetClick(evt) {
     if (pressedButton === 'deal' && betAmount > 0) {
         dealCard(playerHand);
         dealCard(playerHand);
+        //in case 2 aces are dealt, we want to change one of their values to 1
         if (playerHand.value > 21) checkAce(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
@@ -99,7 +113,7 @@ function handleBetClick(evt) {
 function handlePlayClick(evt) {
     if (evt.target.id === 'hit' && playerHand.value < 21) {
         dealCard(playerHand);
-        //check aces first before running bust check
+        //check aces first before running loss check
         if (playerHand.value > 21) checkAce(playerHand);
         //check to see if player loses the round on hit
         if (playerHand.value > 21) {
@@ -114,40 +128,39 @@ function handlePlayClick(evt) {
         //check to see if player loses the round on hit
         if (playerHand.value > 21) {
             turn = 'dealer'
-            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
-            money -= betAmount;
+            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount * 2}`;
+            money -= betAmount * 2;
         } else {
-            turn = `dealer`;
-            //dealer must get cards til their hand value is at least 17
-            while (dealerHand.value < 17) {
-                dealCard(dealerHand);
-            }
-            //check for dealer bust before continuing with comparison
-            if (dealerHand.value <= 21) {
-                compareHands(2);
-            } else {
-                message = `Dealer busts! You win $${betAmount * 2}`;
-                money += betAmount;
-            }
+           //pass value of 2 for double down
+            dealerTurn(2);
         }
     } else if (evt.target.id === 'stand') {
-        turn = `dealer`;
-        //dealer must get cards til their hand value is at least 17
-        while (dealerHand.value < 17) {
-            dealCard(dealerHand);
-            checkAce(dealerHand);
-        }
-
-        //check for dealer bust before continuing with comparison
-        if (dealerHand.value <= 21) {
-            compareHands(1);
-        } else {
-            message = `Dealer busts! You win $${betAmount}`;
-            money += betAmount;
-        }
+        //pass value of 1 for standard play
+        dealerTurn(1);
+    } else if (evt.target.id === 'split'){
+        
     }
     render();
 }
+//function to handle dealer turn, accepts scaling factor for double down
+function dealerTurn(scale) {
+    turn = `dealer`;
+    //dealer must get cards til their hand value is at least 17
+    while (dealerHand.value < 17) {
+        dealCard(dealerHand);
+        //set ace to value of one if it exists and dealers hand has exceeded 21
+        if (dealerHand.value > 21) checkAce(dealerHand);
+    }
+
+    //check for dealer bust before continuing with comparison
+    if (dealerHand.value <= 21) {
+        compareHands(scale);
+    } else {
+        message = `Dealer busts! You win $${betAmount * scale}`;
+        money += betAmount * scale;
+    }
+}
+
 //function to handle reset and next hand buttons
 function handleResetClick(evt) {
     //just run init if reset is clicked, only reset some variables for next hand
@@ -201,6 +214,8 @@ function checkAce(hand) {
 
 //deal card and add to value of hand
 function dealCard(hand) {
+    //make sure we dont run out of cards
+    if (shuffledDeck.length === 0) shuffledDeck = getNewShuffledDeck();
     let card = shuffledDeck.pop()
     hand.cards.push(card);
     hand.value += card.value;
@@ -213,10 +228,10 @@ function compareHands(scale) {
         message = `Both hands are ${playerHand.value}, it's a tie`;
     } else if (playerHand.value > dealerHand.value) {
         message = `You had the better hand! You win $${betAmount * scale}!`
-        money += betAmount;
+        money += betAmount * scale;
     } else {
-        betAmount === money ? message = `Dealer had the better hand! You lost all your money!` : message = `Dealer had the better hand!  You lose $${betAmount}`;
-        money -= betAmount
+        betAmount === money ? message = `Dealer had the better hand! You lost all your money!` : message = `Dealer had the better hand!  You lose $${betAmount * scale}`;
+        money -= betAmount * scale;
     }
 }
 
