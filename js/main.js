@@ -81,8 +81,10 @@ function handleBetClick(evt) {
     if (pressedButton === 'deal' && betAmount > 0) {
         dealCard(playerHand);
         dealCard(playerHand);
+        if (playerHand.value > 21) checkAce(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
+        if (playerHand.value > 21) checkAce(dealerHand);
         message = ''
         turn = 'player'
         checkBlackjack();
@@ -97,6 +99,9 @@ function handleBetClick(evt) {
 function handlePlayClick(evt) {
     if (evt.target.id === 'hit' && playerHand.value < 21) {
         dealCard(playerHand);
+        //check aces first before running bust check
+        if (playerHand.value > 21) checkAce(playerHand);
+        //check to see if player loses the round on hit
         if (playerHand.value > 21) {
             turn = 'dealer'
             betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
@@ -104,6 +109,9 @@ function handlePlayClick(evt) {
         }
     } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
         dealCard(playerHand);
+        //check aces first before running bust check
+        if (playerHand.value > 21) checkAce(playerHand);
+        //check to see if player loses the round on hit
         if (playerHand.value > 21) {
             turn = 'dealer'
             betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
@@ -118,7 +126,7 @@ function handlePlayClick(evt) {
             if (dealerHand.value <= 21) {
                 compareHands(2);
             } else {
-                message = `Dealer busts! You win $${betAmount*2}`;
+                message = `Dealer busts! You win $${betAmount * 2}`;
                 money += betAmount;
             }
         }
@@ -127,7 +135,9 @@ function handlePlayClick(evt) {
         //dealer must get cards til their hand value is at least 17
         while (dealerHand.value < 17) {
             dealCard(dealerHand);
+            checkAce(dealerHand);
         }
+
         //check for dealer bust before continuing with comparison
         if (dealerHand.value <= 21) {
             compareHands(1);
@@ -178,6 +188,17 @@ function checkBlackjack() {
 
 }
 
+//function to change Ace value to one if hand would go over 21 with an ace, in particular only changing one at a time
+function checkAce(hand) {
+    let idx = hand.cards.findIndex(function (card) {
+        return card.value === 11;
+    });
+    if (idx !== -1) {
+        hand.cards[idx].value = 1;
+        hand.value -= 10;
+    }
+}
+
 //deal card and add to value of hand
 function dealCard(hand) {
     let card = shuffledDeck.pop()
@@ -191,7 +212,7 @@ function compareHands(scale) {
     if (playerHand.value === dealerHand.value) {
         message = `Both hands are ${playerHand.value}, it's a tie`;
     } else if (playerHand.value > dealerHand.value) {
-        message = `You had the better hand! You win $${betAmount*scale}!`
+        message = `You had the better hand! You win $${betAmount * scale}!`
         money += betAmount;
     } else {
         betAmount === money ? message = `Dealer had the better hand! You lost all your money!` : message = `Dealer had the better hand!  You lose $${betAmount}`;
