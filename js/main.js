@@ -18,7 +18,7 @@ let betAmountEl = document.getElementById('bet-amount');
 let betButtons = document.getElementById('bet-buttons');
 let playButtons = document.getElementById('play-buttons');
 let resetButtons = document.getElementById('reset-buttons');
-// let dealerCard = document.querySelector('#dealer-hand:first-child');
+
 
 /*----- event listeners -----*/
 betButtons.addEventListener('click', handleBetClick);
@@ -64,26 +64,26 @@ function render() {
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
-            document.querySelector('#dealer-hand .card').style.display = 'none';
+            document.querySelector('#dealer-hand .card:last-child').style.display = 'none';
             break;
         case 'dealer':
             playButtons.style.display = 'none';
             betButtons.style.display = 'none';
             resetButtons.style.display = '';
-            document.querySelector('#dealer-hand .card').style.display = '';
+            document.querySelector('#dealer-hand .card:last-child').style.display = '';
             break;
     }
 }
 
 //function to handle bet buttons, including Deal
 function handleBetClick(evt) {
-    console.log(evt.target);
     let pressedButton = evt.target.id.replace('bet', '');
     if (pressedButton === 'deal' && betAmount > 0) {
         dealCard(playerHand);
         dealCard(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
+        message = ''
         turn = 'player'
         checkBlackjack();
         render();
@@ -93,6 +93,74 @@ function handleBetClick(evt) {
     }
 }
 
+//function to handle play buttons
+function handlePlayClick(evt) {
+    if (evt.target.id === 'hit' && playerHand.value < 21) {
+        dealCard(playerHand);
+        if (playerHand.value > 21) {
+            turn = 'dealer'
+            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
+            money -= betAmount;
+        }
+        // render();
+    } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
+        dealCard(playerHand);
+        if (playerHand.value > 21) {
+            turn = 'dealer'
+            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
+            money -= betAmount;
+        } else {
+            turn = `dealer`;
+            //dealer must get cards til their hand value is at least 17
+            while (dealerHand.value < 17) {
+                dealCard(dealerHand);
+            }
+            //check for dealer bust before continuing with comparison
+            if (dealerHand.value <= 21) {
+                compareHands(2);
+            } else {
+                message = `Dealer busts! You win $${betAmount*2}`;
+                money += betAmount;
+            }
+        }
+    } else if (evt.target.id === 'stand') {
+        turn = `dealer`;
+        //dealer must get cards til their hand value is at least 17
+        while (dealerHand.value < 17) {
+            dealCard(dealerHand);
+        }
+        //check for dealer bust before continuing with comparison
+        if (dealerHand.value <= 21) {
+            compareHands(1);
+        } else {
+            message = `Dealer busts! You win $${betAmount}`;
+            money += betAmount;
+        }
+        // render();
+    }
+    render();
+}
+//function to handle reset and next hand buttons
+function handleResetClick(evt) {
+    //just run init if reset is clicked, only reset some variables for next hand
+    if (evt.target.id === 'reset') {
+        init();
+    } else if (evt.target.id === 'next-hand') {
+        if (money === 0) {
+            return;
+        } else {
+            message = 'Place your bet!';
+            turn = 'bet';
+            betAmount = 0;
+            playerHand.cards = []
+            playerHand.value = 0;
+            dealerHand.cards = [];
+            dealerHand.value = 0;
+            render();
+        }
+    }
+
+}
 //check for blackjack after initial deal
 function checkBlackjack() {
     if (playerHand.value !== 21 && dealerHand.value !== 21) {
@@ -118,41 +186,14 @@ function dealCard(hand) {
     hand.cards.push(card);
     hand.value += card.value;
 }
-//function to handle play buttons
-function handlePlayClick(evt) {
-    if (evt.target.id === 'hit' && playerHand.value < 21) {
-        dealCard(playerHand);
-        if (playerHand.value > 21) {
-            turn = 'dealer'
-            betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
-            money -= betAmount;
-        }
-        render();
-    } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
-        dealCard(playerHand);
-    } else if (evt.target.id === 'stand') {
-        turn = `dealer`;
-        //dealer must get cards til their hand value is at least 17
-        while (dealerHand.value < 17) {
-            dealCard(dealerHand);
-        }
-        //check for dealer bust before continuing with comparison
-        if (dealerHand.value <= 21) {
-            compareHands();
-        } else {
-            message = `Dealer busts! You win $${betAmount}`;
-            money += betAmount;
-        }
-        render();
-    }
 
-}
+
 //function to compare hands against each other at end of dealers turn
-function compareHands() {
+function compareHands(scale) {
     if (playerHand.value === dealerHand.value) {
         message = `Both hands are ${playerHand.value}, it's a tie`;
     } else if (playerHand.value > dealerHand.value) {
-        message = `You had the better hand! You win $${betAmount}!`
+        message = `You had the better hand! You win $${betAmount*scale}!`
         money += betAmount;
     } else {
         betAmount === money ? message = `Dealer had the better hand! You lost all your money!` : message = `Dealer had the better hand!  You lose $${betAmount}`;
@@ -160,27 +201,7 @@ function compareHands() {
     }
 }
 
-//function to handle reset and next hand buttons
-function handleResetClick(evt) {
-    //just run init if reset is clicked, only reset some variables for next hand
-    if (evt.target.id === 'reset') {
-        init();
-    } else if (evt.target.id === 'next-hand') {
-        if (money === 0) {
-            return;
-        } else {
-            message = 'Place your bet!';
-            turn = 'bet';
-            betAmount = 0;
-            playerHand.cards = []
-            playerHand.value = 0;
-            dealerHand.cards = [];
-            dealerHand.value = 0;
-            render();
-        }
-    }
 
-}
 
 
 //deck building function taken from cardstarter repl
