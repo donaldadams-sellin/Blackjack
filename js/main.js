@@ -102,7 +102,6 @@ function handlePlayClick(evt) {
             betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
             money -= betAmount;
         }
-        // render();
     } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
         dealCard(playerHand);
         if (playerHand.value > 21) {
@@ -136,7 +135,6 @@ function handlePlayClick(evt) {
             message = `Dealer busts! You win $${betAmount}`;
             money += betAmount;
         }
-        // render();
     }
     render();
 }
