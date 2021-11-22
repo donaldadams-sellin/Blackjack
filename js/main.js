@@ -12,6 +12,7 @@ let turn, shuffledDeck, playerHand, playerHand2, dealerHand,
 /*----- cached element references -----*/
 let dealerHandEl = document.getElementById('dealer-hand');
 let playerHandEl = document.getElementById('player-hand');
+let playerHand2El = document.getElementById('player-hand2');
 let messageEl = document.getElementById('message');
 let moneyEl = document.getElementById('money');
 let betAmountEl = document.getElementById('bet-amount');
@@ -62,6 +63,7 @@ function render() {
     //render hands using helper function
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
+    renderHand(playerHand2.cards, playerHand2El);
     //don't render double down button after first hit
     playerHand.cards.length > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards
@@ -121,7 +123,7 @@ function handlePlayClick(evt) {
             betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount}`;
             money -= betAmount;
         }
-    } else if (evt.target.id === 'double-down' && playerHand.value < 21) {
+    } else if (evt.target.id === 'double-down' && playerHand.value < 21 && money >= 2 * betAmount) {
         dealCard(playerHand);
         //check aces first before running bust check
         if (playerHand.value > 21) checkAce(playerHand);
@@ -131,14 +133,16 @@ function handlePlayClick(evt) {
             betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount * 2}`;
             money -= betAmount * 2;
         } else {
-           //pass value of 2 for double down
+            //pass value of 2 for double down
             dealerTurn(2);
         }
     } else if (evt.target.id === 'stand') {
         //pass value of 1 for standard play
         dealerTurn(1);
-    } else if (evt.target.id === 'split'){
-        
+    } else if (evt.target.id === 'split') {
+        playerHand2.cards.push(playerHand.cards.pop());
+        dealCard(playerHand);
+        dealCard(playerHand2);
     }
     render();
 }
