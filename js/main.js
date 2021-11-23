@@ -71,9 +71,9 @@ function render() {
     //don't render double down button after first hit
     playerHand.cards.length || split === true > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
-    (split=== false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
+    (split === false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
     //disable hit button on player split hand, if hand is over 21
-    (playerHand2.value > 21) ? document.getElementById('hit').disabled = true :document.getElementById('hit').disabled = false; 
+    (playerHand2.value > 21) ? document.getElementById('hit').disabled = true : document.getElementById('hit').disabled = false;
     //change which buttons are displayed based on turn, hide dealers 2nd card during player turn
     switch (turn) {
         case 'bet':
@@ -127,8 +127,8 @@ function handleBetClick(evt) {
 //function to handle play buttons
 function handlePlayClick(evt) {
     if (evt.target.id === 'hit') {
-       //if player hits on hand of 2 aces switch one to a value of 1 also allows hitting on 21 if at least one card is an ace
-       if (playerHand.value > 21) checkAce(playerHand);
+        //if player hits on hand of 2 aces switch one to a value of 1 also allows hitting on 21 if at least one card is an ace
+        if (playerHand.value > 21) checkAce(playerHand);
         //determine if the hand is split
         if (turn === 'player' && split === false && playerHand.value < 21) {
             dealCard(playerHand);
@@ -147,7 +147,7 @@ function handlePlayClick(evt) {
             //check to see if player loses the round on hit
             if (playerHand.value > 21) {
                 turn = 'player2'
-                betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount} on your first hand`;
+                message = `Bust! You lose $${betAmount} on your first hand, play the second!`;
                 money -= betAmount;
             }
         } else if (turn === 'player2') {
@@ -174,7 +174,7 @@ function handlePlayClick(evt) {
             dealerTurn(2);
         }
     } else if (evt.target.id === 'stand') {
-       //if player stands on hand of 2 aces switch one to a value of 1
+        //if player stands on hand of 2 aces switch one to a value of 1
         if (playerHand.value > 21) checkAce(playerHand);
         //pass value of 1 for standard play
         if (split === true && turn === 'player') {
@@ -282,7 +282,8 @@ function dealerTurn(scale) {
                 message = `Dealer busts, you win $${betAmount}`;
                 money += betAmount;
             }
-        } else {
+        //only run comparisons against both hands if both hands havent bust
+        } else if (playerHand.value <= 21 && playerHand2.value <= 21) {
             if (dealerHand.value > playerHand.value && dealerHand.value > playerHand2.value) {
                 message = `Dealer hand beats both hands! You lose $${betAmount * 2}`;
                 money -= betAmount * 2;
@@ -304,10 +305,15 @@ function dealerTurn(scale) {
             } else if (dealerHand.value === playerHand.value && dealerHand.value > playerHand2.value) {
                 message = `Dealer beats second hand, ties first! You lose $${betAmount}`;
                 money -= betAmount;
-            } else if (dealerHand.value < playerHand.value && dealerHand.value < playerHand2.value && playerHand2.value <=21) {
+            } else if (dealerHand.value < playerHand.value && dealerHand.value < playerHand2.value) {
                 message = `Dealer loses to both hands! You win $${betAmount * 2}`;
                 money += betAmount * 2;
             }
+        //use compare hands function on only one hand, if the other has bust
+        } else if (playerHand2 > 21) {
+            compareHands(playerHand, 1);
+        } else {
+            compareHands(playerHand2,1);
         }
     }
 }
