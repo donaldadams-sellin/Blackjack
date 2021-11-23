@@ -72,6 +72,8 @@ function render() {
     playerHand.cards.length || split === true > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (split=== false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
+    //disable hit button on player split hand, if hand is over 21
+    (playerHand2.value > 21) ? document.getElementById('hit').disabled = true :document.getElementById('hit').disabled = false; 
     //change which buttons are displayed based on turn, hide dealers 2nd card during player turn
     switch (turn) {
         case 'bet':
@@ -302,7 +304,7 @@ function dealerTurn(scale) {
             } else if (dealerHand.value === playerHand.value && dealerHand.value > playerHand2.value) {
                 message = `Dealer beats second hand, ties first! You lose $${betAmount}`;
                 money -= betAmount;
-            } else if (dealerHand.value < playerHand.value && dealerHand.value < playerHand2.value) {
+            } else if (dealerHand.value < playerHand.value && dealerHand.value < playerHand2.value && playerHand2.value <=21) {
                 message = `Dealer loses to both hands! You win $${betAmount * 2}`;
                 money += betAmount * 2;
             }
