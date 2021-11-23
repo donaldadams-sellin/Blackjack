@@ -60,6 +60,10 @@ function render() {
     moneyEl.textContent = `Money: $${money}`;
     messageEl.textContent = message;
     betAmountEl.textContent = `Current Bet: $${betAmount}`
+    //hide borders for hands if hands are empty
+    playerHand.cards.length === 0 ? playerHandEl.style.borderStyle = 'hidden' : playerHandEl.style.borderStyle = 'solid';
+    playerHand2.cards.length === 0 ? playerHand2El.style.borderStyle = 'hidden' : playerHand2El.style.borderStyle = 'solid'
+    dealerHand.cards.length === 0 ? dealerHandEl.style.borderStyle = 'hidden' : dealerHandEl.style.borderStyle = 'solid';
     //render hands using helper function
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
@@ -68,7 +72,7 @@ function render() {
     playerHand.cards.length || split === true > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (split=== false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
-    //change which buttons are displayed based on turn
+    //change which buttons are displayed based on turn, hide dealers 2nd card during player turn
     switch (turn) {
         case 'bet':
             playButtons.style.display = 'none';
