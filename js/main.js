@@ -65,9 +65,9 @@ function render() {
     renderHand(dealerHand.cards, dealerHandEl);
     renderHand(playerHand2.cards, playerHand2El);
     //don't render double down button after first hit
-    playerHand.cards.length > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
-    //show split button if player has 2 equal value cards
-    (playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
+    playerHand.cards.length || split === true > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
+    //show split button if player has 2 equal value cards, and the player hasn't already split
+    (split=== false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
     //change which buttons are displayed based on turn
     switch (turn) {
         case 'bet':
