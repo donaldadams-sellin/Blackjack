@@ -103,9 +103,10 @@ function handleBetClick(evt) {
         dealCard(playerHand);
         dealCard(playerHand);
         //in case 2 aces are dealt, we want to change one of their values to 1
-        if (playerHand.value > 21) checkAce(playerHand);
+        // if (playerHand.value > 21) checkAce(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
+        //in case 2 aces are dealt, we want to change one of their values to 1
         if (dealerHand.value > 21) checkAce(dealerHand);
         message = ''
         turn = 'player'
@@ -120,6 +121,8 @@ function handleBetClick(evt) {
 //function to handle play buttons
 function handlePlayClick(evt) {
     if (evt.target.id === 'hit') {
+       //if player hits on hand of 2 aces switch one to a value of 1 also allows hitting on 21 if at least one card is an ace
+       if (playerHand.value > 21) checkAce(playerHand);
         //determine if the hand is split
         if (turn === 'player' && split === false && playerHand.value < 21) {
             dealCard(playerHand);
@@ -143,6 +146,8 @@ function handlePlayClick(evt) {
             }
         } else if (turn === 'player2') {
             dealCard(playerHand2);
+            //check aces first before running loss check
+            if (playerHand2.value > 21) checkAce(playerHand2);
             if (playerHand2.value > 21) {
                 turn = 'player2'
                 betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount} on your second hand`;
@@ -163,6 +168,8 @@ function handlePlayClick(evt) {
             dealerTurn(2);
         }
     } else if (evt.target.id === 'stand') {
+       //if player stands on hand of 2 aces switch one to a value of 1
+        if (playerHand.value > 21) checkAce(playerHand);
         //pass value of 1 for standard play
         if (split === true && turn === 'player') {
             turn = 'player2'
