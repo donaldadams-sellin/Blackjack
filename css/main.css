@@ -82,8 +82,8 @@ main {
 }
 
 #bet-buttons, #play-buttons, #reset-buttons {
-    grid-column: 3;
-    grid-row: 2;
+    grid-column: 2;
+    grid-row: 4;
 }
 
 .bet {
@@ -104,10 +104,6 @@ main {
     #deck, #dealer-hand, #player-hand,#player-hand2 {
         font-size: 26px;
     }
-    #bet-buttons, #play-buttons, #reset-buttons {
-        grid-column: 3;
-        grid-row: 2;
-    }
     
 }
 
@@ -117,10 +113,6 @@ main {
     }
     #deck, #dealer-hand, #player-hand, #player-hand2 {
         font-size: 18px;
-    }
-    #bet-buttons, #play-buttons, #reset-buttons {
-        grid-column: 3;
-        grid-row: 2;
     }
     .play, .bet {
         font-size: 15px;
