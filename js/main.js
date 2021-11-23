@@ -266,7 +266,8 @@ function dealerTurn(scale) {
             message = `Dealer busts! You win $${betAmount * scale}`;
             money += betAmount * scale;
         }
-    } else {
+        //only perform checks if at least one hand is available
+    } else if(playerHand.value <= 21 || playerHand2.value <= 21){
         //dealer must get cards til their hand value is at least 17
         while (dealerHand.value < 17) {
             dealCard(dealerHand);
