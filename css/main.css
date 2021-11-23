@@ -114,12 +114,12 @@ main {
     
 }
 
-@media screen and (max-width: 1100px){
+/* @media screen and (max-width: 1100px){
     main{
         font-size: 26px;
     }
     #deck, #dealer-hand, #player-hand, #player-hand2 {
-        font-size: 12px;
+        font-size: 18px;
     }
     #bet-buttons, #play-buttons, #reset-buttons {
         grid-column: 3;
@@ -129,4 +129,4 @@ main {
         font-size: 15px;
     }
     
-}
+} */
