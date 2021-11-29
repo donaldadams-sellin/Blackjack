@@ -72,6 +72,8 @@ function render() {
     playerHand.cards.length || split > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (!split && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
+    //disable hit button on player split hand, if hand is over 21
+    (playerHand2.value > 21) ? document.getElementById('hit').disabled = true : document.getElementById('hit').disabled = false;
     //controls what is displayed based on turn, such as buttons, and hiding dealers second card on player turn
     switch (turn) {
         case 'bet':
@@ -165,7 +167,7 @@ function handlePlayClick(evt) {
             //check aces first before running loss check
             if (playerHand2.value > 21) checkAce(playerHand2);
             if (playerHand2.value > 21) {
-                turn = 'dealer'
+                turn = 'player2'
                 betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount} on your second hand`;
                 money -= betAmount;
             }
