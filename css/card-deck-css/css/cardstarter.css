@@ -29,8 +29,7 @@
   .card.small {
     font-size: 12px; }
   .card.large {
-    /* modified from 26px to function better with css scaling */
-    font-size: inherit; }
+    font-size: 26px; }
   .card.xlarge {
     font-size: 42px; }
   .card.no-border {

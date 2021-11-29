@@ -15,12 +15,14 @@ let playerHandEl = document.getElementById('player-hand');
 let playerHand2El = document.getElementById('player-hand2');
 let messageEl = document.getElementById('message');
 let moneyEl = document.getElementById('money');
-let betAmountEl = document.getElementById('bet-amount');
 let betButtons = document.getElementById('bet-buttons');
 let playButtons = document.getElementById('play-buttons');
 let resetButtons = document.getElementById('reset-buttons');
 let doubleDownEl = document.getElementById('double-down');
 let splitEl = document.getElementById('split');
+let dealerValueEl = document.getElementById('dealer-value');
+let playerValueEl = document.getElementById('player-value');
+let playerValue2El = document.getElementById('player-value2');
 
 
 /*----- event listeners -----*/
@@ -57,9 +59,10 @@ function init() {
 
 //main render function
 function render() {
-    moneyEl.textContent = `Money: $${money}`;
+    moneyEl.innerHTML = `Money: $${money}<br>Current Bet: $${betAmount}`;
     messageEl.textContent = message;
-    betAmountEl.textContent = `Current Bet: $${betAmount}`
+    //display hand values under proper conditions
+  
     //hide borders for hands if hands are empty
     playerHand.cards.length === 0 ? playerHandEl.style.borderStyle = 'hidden' : playerHandEl.style.borderStyle = 'solid';
     playerHand2.cards.length === 0 ? playerHand2El.style.borderStyle = 'hidden' : playerHand2El.style.borderStyle = 'solid'
@@ -68,36 +71,48 @@ function render() {
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
     renderHand(playerHand2.cards, playerHand2El);
+    //display values of hands, only if they exist
     //don't render double down button after first hit
     playerHand.cards.length || split === true > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (split === false && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
     //disable hit button on player split hand, if hand is over 21
     (playerHand2.value > 21) ? document.getElementById('hit').disabled = true : document.getElementById('hit').disabled = false;
-    //change which buttons are displayed based on turn, hide dealers 2nd card during player turn
+    //controls what is displayed based on turn, such as buttons, and hiding dealers second card on player turn
     switch (turn) {
         case 'bet':
             playButtons.style.display = 'none';
             betButtons.style.display = '';
             resetButtons.style.display = 'none';
+            dealerValueEl.style.display = 'none';
+            playerValueEl.style.display = 'none';
+            playerValue2El.style.display = 'none';
             break;
         case 'player':
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
             document.querySelector('#dealer-hand .card:last-child').style.display = 'none';
+            dealerValueEl.style.display = '';
+            dealerValueEl.textContent = `Dealer: ${dealerHand.value-dealerHand.cards[1].value}`;
+            playerValueEl.style.display = '';
+            playerValueEl.textContent = `Player: ${playerHand.value}`;
+            playerValue2El.style.display = 'none';
             break;
         case 'player2':
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
             document.querySelector('#dealer-hand .card:last-child').style.display = 'none';
+            playerValue2El.style.display = '';
+            playerValue2El.textContent = `Player 2nd Hand: ${playerHand2.value}`;
             break;
         case 'dealer':
             playButtons.style.display = 'none';
             betButtons.style.display = 'none';
             resetButtons.style.display = '';
             document.querySelector('#dealer-hand .card:last-child').style.display = '';
+            dealerValueEl.textContent = `Dealer: ${dealerHand.value}`;
             break;
     }
 }
@@ -108,11 +123,9 @@ function handleBetClick(evt) {
     if (pressedButton === 'deal' && betAmount > 0) {
         dealCard(playerHand);
         dealCard(playerHand);
-        //in case 2 aces are dealt, we want to change one of their values to 1
-        // if (playerHand.value > 21) checkAce(playerHand);
         dealCard(dealerHand);
         dealCard(dealerHand);
-        //in case 2 aces are dealt, we want to change one of their values to 1
+        //in case 2 aces are dealt, we want to change one of their values to 1 for dealer
         if (dealerHand.value > 21) checkAce(dealerHand);
         message = ''
         turn = 'player'
@@ -328,7 +341,7 @@ function dealCard(hand) {
 }
 
 
-//function to compare hands against each other at end of dealers turn
+//function to compare hands against each other at end of dealers turn, only works when a single hand is to be evaluated
 function compareHands(pHand, scale) {
     if (pHand.value === dealerHand.value) {
         message = `Both hands are ${pHand.value}, it's a tie`;
