@@ -37,6 +37,14 @@ main {
     border-radius: 10%;
     padding: 10px;
 }
+/* allow cards to overlap */
+.card{
+    margin: 0 0 0 -50px;
+}
+/* ensures first card stays in box */
+div.card:first-child{
+    margin: 0;
+}
 
 #dealer-value{
     grid-column: 1;
