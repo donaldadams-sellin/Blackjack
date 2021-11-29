@@ -61,12 +61,8 @@ function init() {
 function render() {
     moneyEl.innerHTML = `Money: $${money}<br>Current Bet: $${betAmount}`;
     messageEl.textContent = message;
-    //display hand values under proper conditions
-  
-    //hide borders for hands if hands are empty
-    // playerHand.cards.length === 0 ? playerHandEl.style.borderStyle = 'hidden' : playerHandEl.style.borderStyle = 'solid';
+    //hide borders for 2nd hand if it does not exist
     playerHand2.cards.length === 0 ? playerHand2El.style.borderStyle = 'hidden' : playerHand2El.style.borderStyle = 'solid'
-    // dealerHand.cards.length === 0 ? dealerHandEl.style.borderStyle = 'hidden' : dealerHandEl.style.borderStyle = 'solid';
     //render hands using helper function
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
@@ -76,8 +72,6 @@ function render() {
     playerHand.cards.length || split > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (!split && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
-    //disable hit button on player split hand, if hand is over 21
-    (playerHand2.value > 21) ? document.getElementById('hit').disabled = true : document.getElementById('hit').disabled = false;
     //controls what is displayed based on turn, such as buttons, and hiding dealers second card on player turn
     switch (turn) {
         case 'bet':
@@ -171,7 +165,7 @@ function handlePlayClick(evt) {
             //check aces first before running loss check
             if (playerHand2.value > 21) checkAce(playerHand2);
             if (playerHand2.value > 21) {
-                turn = 'player2'
+                turn = 'dealer'
                 betAmount === money ? message = `Bust! You lost all your money!` : message = `Bust! You lose $${betAmount} on your second hand`;
                 money -= betAmount;
             }
