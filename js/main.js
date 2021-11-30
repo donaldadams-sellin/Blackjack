@@ -67,9 +67,8 @@ function render() {
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
     renderHand(playerHand2.cards, playerHand2El);
-    //display values of hands, only if they exist
     //don't render double down button after first hit
-    playerHand.cards.length || split > 2 ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
+    playerHand.cards.length > 2 || split  ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (!split && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
     //disable hit button on player split hand, if hand is over 21
@@ -88,7 +87,7 @@ function render() {
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
-            //grab this item here rather than in declared variables because it does not exist until cards are dealt
+            //grab this item here rather than in declared cached elements because it does not exist until cards are dealt
             document.querySelector('#dealer-hand .card:last-child').classList.add('back-blue');
             dealerValueEl.style.display = '';
             dealerValueEl.textContent = `Dealer: ${dealerHand.value-dealerHand.cards[1].value}`;
@@ -100,7 +99,7 @@ function render() {
             playButtons.style.display = '';
             betButtons.style.display = 'none';
             resetButtons.style.display = 'none';
-            // document.querySelector('#dealer-hand .card:last-child').style.display = 'none';
+            document.querySelector('#dealer-hand .card:last-child').classList.add('back-blue');
             playerValue2El.style.display = '';
             playerValue2El.textContent = `Player 2nd Hand: ${playerHand2.value}`;
             break;
@@ -131,7 +130,7 @@ function handleBetClick(evt) {
         checkBlackjack();
         render();
     } else if (parseInt(pressedButton)) {
-        betAmount + parseInt(pressedButton) <= money ? betAmount += parseInt(pressedButton) : null;
+        if(betAmount + parseInt(pressedButton) <= money) betAmount += parseInt(pressedButton);
         render();
     }
 }
@@ -298,7 +297,7 @@ function dealerTurn(scale) {
         //only run comparisons against both hands if both hands havent bust
         } else if (playerHand.value <= 21 && playerHand2.value <= 21) {
             if (dealerHand.value > playerHand.value && dealerHand.value > playerHand2.value) {
-                message = `Dealer hand beats both hands! You lose $${betAmount * 2}`;
+                message = `Dealer beats both hands! You lose $${betAmount * 2}`;
                 money -= betAmount * 2;
             } else if (dealerHand.value > playerHand.value && dealerHand.value < playerHand2.value) {
                 message = `Dealer beats first hand, but loses to second. You break even!`;
