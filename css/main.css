@@ -91,14 +91,6 @@ div.card:first-child{
     
 }
 
-/* #bet-amount {
-    grid-column: 3;
-    grid-row: 3;
-    border: 5px solid black;
-    border-radius: 10%;
-    padding: 10px;
-} */
-
 #bet-buttons, #play-buttons, #reset-buttons {
     grid-column: 3;
     grid-row: 2;

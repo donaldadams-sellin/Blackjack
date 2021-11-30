@@ -32,6 +32,8 @@ resetButtons.addEventListener('click', handleResetClick);
 
 /*----- functions -----*/
 init();
+
+
 function init() {
     shuffledDeck = getNewShuffledDeck();
     playerHand = {
@@ -57,6 +59,7 @@ function init() {
     render();
 }
 
+
 //main render function
 function render() {
     moneyEl.innerHTML = `Money: $${money}<br>Current Bet: $${betAmount}`;
@@ -67,7 +70,7 @@ function render() {
     renderHand(playerHand.cards, playerHandEl);
     renderHand(dealerHand.cards, dealerHandEl);
     renderHand(playerHand2.cards, playerHand2El);
-    //don't render double down button after first hit
+    //don't render double down button after first hit or for splits
     playerHand.cards.length > 2 || split  ? doubleDownEl.style.display = 'none' : doubleDownEl.style.display = '';
     //show split button if player has 2 equal value cards, and the player hasn't already split
     (!split && playerHand.cards.length === 2 && playerHand.cards[0].value === playerHand.cards[1].value) ? splitEl.style.display = '' : splitEl.style.display = 'none';
@@ -110,10 +113,11 @@ function render() {
             document.querySelector('#dealer-hand .card:last-child').classList.remove('back-blue');
             dealerValueEl.textContent = `Dealer: ${dealerHand.value}`;
             playerValueEl.textContent = `Player: ${playerHand.value}`;
-            split ? playerValue2El.textContent = `Player 2nd Hand: ${playerHand2.value}`: null;
+            if(split)  playerValue2El.textContent = `Player 2nd Hand: ${playerHand2.value}`;
             break;
     }
 }
+
 
 //function to handle bet buttons, including Deal
 function handleBetClick(evt) {
@@ -134,6 +138,7 @@ function handleBetClick(evt) {
         render();
     }
 }
+
 
 //function to handle play buttons
 function handlePlayClick(evt) {
@@ -206,6 +211,7 @@ function handlePlayClick(evt) {
     render();
 }
 
+
 //function to handle reset and next hand buttons
 function handleResetClick(evt) {
     //just run init if reset is clicked, only reset some variables for next hand
@@ -230,6 +236,8 @@ function handleResetClick(evt) {
     }
 
 }
+
+
 //check for blackjack after initial deal
 function checkBlackjack() {
     if (playerHand.value !== 21 && dealerHand.value !== 21) {
@@ -259,6 +267,7 @@ function checkAce(hand) {
         hand.value -= 10;
     }
 }
+
 
 //function to handle dealer turn, accepts scaling factor for double down
 function dealerTurn(scale) {
@@ -329,6 +338,8 @@ function dealerTurn(scale) {
         }
     }
 }
+
+
 //deal card and add to value of hand
 function dealCard(hand) {
     //make sure we dont run out of cards
@@ -351,8 +362,6 @@ function compareHands(pHand, scale) {
         money -= betAmount * scale;
     }
 }
-
-
 
 
 //deck building function taken from cardstarter repl
