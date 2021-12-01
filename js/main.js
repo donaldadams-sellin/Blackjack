@@ -216,6 +216,7 @@ function handlePlayClick(evt) {
 function handleResetClick(evt) {
     //just run init if reset is clicked, only reset some variables for next hand
     if (evt.target.id === 'reset') {
+        resetAces(masterDeck);
         init();
     } else if (evt.target.id === 'next-hand') {
         if (money === 0) {
@@ -231,6 +232,7 @@ function handleResetClick(evt) {
             dealerHand.cards = [];
             dealerHand.value = 0;
             split = false;
+            resetAces(masterDeck);
             render();
         }
     }
@@ -266,6 +268,14 @@ function checkAce(hand) {
         hand.cards[idx].value = 1;
         hand.value -= 10;
     }
+}
+
+
+//function to reset Aces that have been changed to 1, since all arrays reference the same object
+function resetAces(deck){
+    deck.forEach(function(card){
+        if(card.value === 1) card.value = 11;
+    });
 }
 
 
@@ -343,7 +353,7 @@ function dealerTurn(scale) {
 //deal card and add to value of hand
 function dealCard(hand) {
     //make sure we dont run out of cards
-    if (shuffledDeck.length === 0) shuffledDeck = getNewShuffledDeck();
+    if (shuffledDeck.length === 0){ shuffledDeck = getNewShuffledDeck()};
     let card = shuffledDeck.pop()
     hand.cards.push(card);
     hand.value += card.value;
